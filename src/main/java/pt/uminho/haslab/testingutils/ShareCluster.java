@@ -28,6 +28,8 @@ public class ShareCluster {
 		configs = new ArrayList<Configuration>();
 		System.setProperty("hadoop.home.dir", "/home/roger/hadoop-2.7.2");
 
+		LOG.debug("Going to start start shareCluster " + resources);
+
 		for (String resource : resources) {
 			LOG.debug("Going to start minicluster " + resource);
 			Configuration conf = HBaseConfiguration.create();
