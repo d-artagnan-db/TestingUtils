@@ -5,6 +5,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellScanner;
 import org.apache.hadoop.hbase.CellUtil;
@@ -13,6 +15,7 @@ import pt.uminho.haslab.smhbase.interfaces.SharedSecret;
 import pt.uminho.haslab.smhbase.sharemindImp.SharemindSharedSecret;
 
 public class ClusterScanResult {
+	static final Log LOG = LogFactory.getLog(ClusterScanResult.class.getName());
 
 	private final List<List<Result>> scans;
 
@@ -40,7 +43,7 @@ public class ClusterScanResult {
 		List<Result> scanOne = scans.get(0);
 		List<Result> scanTwo = scans.get(1);
 		List<Result> scanThree = scans.get(2);
-		System.out.println("Scan size is " + scanOne.size());
+		LOG.debug("Scan size is " + scanOne.size());
 		return scanOne.size() == scanTwo.size()
 				& scanTwo.size() == scanThree.size();
 

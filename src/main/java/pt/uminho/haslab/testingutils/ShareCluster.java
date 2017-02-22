@@ -26,7 +26,6 @@ public class ShareCluster {
 		clusters = new ArrayList<MiniHBaseCluster>();
 		admins = new ArrayList<HBaseAdmin>();
 		configs = new ArrayList<Configuration>();
-		System.setProperty("hadoop.home.dir", "/home/roger/hadoop-2.7.2");
 
 		LOG.debug("Going to start start shareCluster " + resources);
 
@@ -49,9 +48,7 @@ public class ShareCluster {
 
 			configs.add(conf);
 			admins.add(new HBaseAdmin(conf));
-			// System.out.println("Creating class");
 			MiniHBaseCluster hbase = new MiniHBaseCluster(conf, 1);
-			// System.out.println("Class created");
 			clusters.add(hbase);
 
 		}

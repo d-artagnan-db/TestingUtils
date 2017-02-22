@@ -103,10 +103,10 @@ public class ClusterTables {
 		public void run() {
 			try {
 				scanner = table.getScanner(scan);
-				System.out.println("Concurrent scanner is running");
+				LOG.debug("Concurrent scanner is running");
 				for (Result result = scanner.next(); result != null; result = scanner
 						.next()) {
-					System.out.println("Going to add scan result " + result);
+					LOG.debug("Going to add scan result " + result);
 					results.add(result);
 				}
 
@@ -114,7 +114,7 @@ public class ClusterTables {
 				LOG.debug(ex);
 				throw new IllegalStateException(ex);
 			}
-			System.out.println("Scan result size is " + results.size());
+			LOG.debug("Scan result size is " + results.size());
 
 		}
 
@@ -165,18 +165,18 @@ public class ClusterTables {
 		for (int i = 0; i < scans.size(); i++) {
 			HTable table = tables.get(i);
 			Scan scan = scans.get(i);
-			System.out.println("Creating new Concurrent Scan");
+			LOG.debug("Creating new Concurrent Scan");
 			tscans.add(new ConcurrentScan(table, scan));
 		}
 
 		for (ConcurrentScan t : tscans) {
-			System.out.println("Launching concurent Scans");
+			LOG.debug("Launching concurent Scans");
 
 			((Thread) t).start();
 		}
 
 		for (ConcurrentScan t : tscans) {
-			System.out.println("Joining conccurent scans");
+			LOG.debug("Joining conccurent scans");
 			((Thread) t).join();
 
 		}

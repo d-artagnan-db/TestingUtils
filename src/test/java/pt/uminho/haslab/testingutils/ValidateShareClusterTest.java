@@ -5,6 +5,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.Put;
 import org.junit.After;
@@ -18,6 +20,8 @@ import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class ValidateShareClusterTest {
+	static final Log LOG = LogFactory.getLog(ValidateShareClusterTest.class
+			.getName());
 
 	protected final ShareCluster cluster;
 	protected final int maxBits;
@@ -55,8 +59,11 @@ public class ValidateShareClusterTest {
 
 	@Test
 	public void testCreateTables() throws IOException {
+		LOG.debug("Going to create table");
 		assertEquals(false, cluster.tableExists("teste"));
+		LOG.debug("Going to create table");
 		cluster.createTables("teste", "teste");
+		LOG.debug("Table created");
 		assertEquals(true, cluster.tableExists("teste"));
 
 	}
