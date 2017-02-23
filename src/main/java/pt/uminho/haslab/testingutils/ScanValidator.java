@@ -66,10 +66,13 @@ public class ScanValidator {
 
 	public boolean validateResults(List<Result> results) {
 		boolean valid;
+		LOG.debug("Going to validate Results");
 		List<BigInteger> valuesInRange = getKeysInRange();
 
 		Set<BigInteger> valueSet = new HashSet<BigInteger>(valuesInRange);
-		LOG.debug("Values in range " + valuesInRange + " cenas " + results);
+		LOG.debug("Values in range " + valuesInRange + " a total of "
+				+ valuesInRange.size());
+		LOG.debug("Received " + results.size() + " from the database ");
 		valid = valuesInRange.size() == results.size();
 
 		for (Result res : results) {
@@ -83,7 +86,7 @@ public class ScanValidator {
 
 	private List<BigInteger> getKeysInRange() {
 		List<BigInteger> rangeValues = new ArrayList<BigInteger>();
-
+		LOG.debug("Going to get keys in range");
 		LOG.debug("Selected start key is " + this.selectedStartKey);
 		LOG.debug("Selected stop key is " + this.selectedStopKey);
 
