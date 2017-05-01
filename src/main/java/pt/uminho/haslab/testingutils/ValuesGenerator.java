@@ -18,7 +18,9 @@ public class ValuesGenerator {
 	 */
 	public static final int maxBits = 62;
 
-	public static final int nValues = 10;
+	public static final int nValues = 95;
+
+	public static final int batchValues = 200;
 
 	/* Number of bits must be greater than 0 */
 	private static int genNumberBits(int maxBits) {
@@ -168,6 +170,43 @@ public class ValuesGenerator {
 		return Arrays.asList(parameters);
 	}
 
+	public static Collection SendAndReceiveBatchMessageBrokerTest2() {
+		Object[] parameters = new Object[1];
+
+		List<List<BigInteger>> peerOne = new ArrayList<List<BigInteger>>();
+		List<List<BigInteger>> peerTwo = new ArrayList<List<BigInteger>>();
+		List<List<BigInteger>> peerThree = new ArrayList<List<BigInteger>>();
+
+		for (int i = 0; i < nValues; i++) {
+
+			int genNbits = genNumberBits(maxBits);
+			List<BigInteger> valsOne = new ArrayList<BigInteger>();
+			List<BigInteger> valsTwo = new ArrayList<BigInteger>();
+			List<BigInteger> valsThree = new ArrayList<BigInteger>();
+
+			for (int j = 0; j < batchValues; j++) {
+				BigInteger valOne = new BigInteger(genNbits, generator);
+				BigInteger valTwo = new BigInteger(genNbits, generator);
+				BigInteger valThree = new BigInteger(genNbits, generator);
+
+				valsOne.add(valOne);
+				valsTwo.add(valTwo);
+				valsThree.add(valThree);
+			}
+			peerOne.add(valsOne);
+			peerTwo.add(valsTwo);
+			peerThree.add(valsThree);
+
+		}
+		Object[] parameter = new Object[3];
+		parameter[0] = peerOne;
+		parameter[1] = peerTwo;
+		parameter[2] = peerThree;
+		parameters[0] = parameter;
+
+		return Arrays.asList(parameters);
+	}
+
 	public static List<BigInteger> BootPlayerList() {
 
 		List<BigInteger> values = new ArrayList<BigInteger>();
@@ -227,13 +266,48 @@ public class ValuesGenerator {
 
 		for (int i = 0; i < nValues; i++) {
 
-			int genNbits = genNumberBits(maxBits);
+			int genNbits = maxBits;// genNumberBits(maxBits);
 			BigInteger genValueOne = new BigInteger(genNbits, generator);
 			BigInteger genValueTwo = new BigInteger(genNbits, generator);
 
 			nBits.add(genNbits);
 			firstValues.add(genValueOne);
 			secondValues.add(genValueTwo);
+
+		}
+
+		Object[] parameter = new Object[3];
+		parameter[0] = nBits;
+		parameter[1] = firstValues;
+		parameter[2] = secondValues;
+
+		parameters[0] = parameter;
+		return Arrays.asList(parameters);
+	}
+
+	public static Collection TwoBatchValuesGenerator() {
+		Object[] parameters = new Object[1];
+		List<Integer> nBits = new ArrayList<Integer>();
+		List<List<BigInteger>> firstValues = new ArrayList<List<BigInteger>>();
+		List<List<BigInteger>> secondValues = new ArrayList<List<BigInteger>>();
+
+		for (int i = 0; i < nValues; i++) {
+
+			int genNbits = genNumberBits(maxBits);
+			List<BigInteger> genValsOne = new ArrayList<BigInteger>();
+			List<BigInteger> genValsTwo = new ArrayList<BigInteger>();
+
+			for (int j = 0; j < batchValues; j++) {
+				BigInteger genValueOne = new BigInteger(genNbits, generator);
+				BigInteger genValueTwo = new BigInteger(genNbits, generator);
+				genValsOne.add(genValueOne);
+				genValsTwo.add(genValueTwo);
+
+			}
+
+			nBits.add(genNbits);
+			firstValues.add(genValsOne);
+			secondValues.add(genValsTwo);
 
 		}
 
