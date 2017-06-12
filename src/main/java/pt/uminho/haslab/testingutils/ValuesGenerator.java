@@ -73,6 +73,17 @@ public class ValuesGenerator {
 		return sb.toString();
 	}
 
+	public static String randomNumber(int nbits) {
+		char[] chars = "0123456789".toCharArray();
+		StringBuilder sb = new StringBuilder();
+		Random random = new Random();
+		for (int i = 0; i < nbits; i++) {
+			char c = chars[random.nextInt(chars.length)];
+			sb.append(c);
+		}
+		return sb.toString();
+	}
+
 	public static Collection TestPeerGenerator() {
 
 		Object[] parameters = new Object[2];
