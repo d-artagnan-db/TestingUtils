@@ -485,4 +485,33 @@ public class ValuesGenerator {
 
 	}
 
+	public static Collection RedisTestValueGenerator() {
+		Object[] parameters = new Object[1];
+		List<String> ips = new ArrayList<String>();
+		List<Integer> ports = new ArrayList<Integer>();
+		String ip = "192.168.12.";
+
+		BigInteger requestID = new BigInteger(maxBits, generator);
+		BigInteger regionID = new BigInteger(maxBits, generator);
+
+		for (int i = 0; i < 3; i++) {
+			int ipsufix = generator.nextInt();
+			int port = generator.nextInt();
+			String destip = ip + ipsufix;
+
+			ips.add(destip);
+			ports.add(port);
+		}
+
+		Object[] parameter = new Object[4];
+		parameter[0] = requestID;
+		parameter[1] = regionID;
+		parameter[2] = ips;
+		parameter[3] = ports;
+		parameters[0] = parameter;
+
+		return Arrays.asList(parameters);
+
+	}
+
 }
