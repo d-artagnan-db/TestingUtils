@@ -575,4 +575,19 @@ public class ValuesGenerator {
 
 	}
 
+	public static Collection PeerConnectionManagerSingleServerTestValueGenerator() {
+		Object[] parameters = new Object[1];
+		String ip = "localhost";
+		int port = 6262;
+		byte[] message = new BigInteger(maxBits, generator).toByteArray();
+
+		Object[] parameter = new Object[3];
+		parameter[0] = ip;
+		parameter[1] = port;
+		parameter[2] = message;
+		parameters[0] = parameter;
+
+		return Arrays.asList(parameters);
+	}
+
 }
