@@ -132,12 +132,12 @@ public class ClusterTables {
 		}
 
 		for (ConcurrentGet t : tgets) {
-			((Thread) t).start();
+			t.start();
 		}
 
 		for (ConcurrentGet t : tgets) {
 
-			((Thread) t).join();
+			t.join();
 
 		}
 

@@ -56,7 +56,7 @@ public class ShareCluster {
 		LOG.info("Created " + clusters.size()
 				+ " clusters. Going to wait for them to start");
 		// wait for everything to be online, hbase and CMiddleware
-		Thread.sleep(30000);
+		Thread.sleep(1000);
 		LOG.info("Stopped waiting for cluster start");
 
 	}

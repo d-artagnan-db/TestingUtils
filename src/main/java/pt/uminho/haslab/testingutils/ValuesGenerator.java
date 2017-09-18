@@ -15,8 +15,8 @@ public class ValuesGenerator {
 	 * the value.
 	 */
 	public static final int maxBits = 62;
-	public static final int nValues = 95;
-	public static final int batchValues = 200;
+	public static final int nValues = 10;
+	public static final int batchValues = 10;
 	private final static SecureRandom generator = new SecureRandom();
 
 	/* Number of bits must be greater than 0 */
