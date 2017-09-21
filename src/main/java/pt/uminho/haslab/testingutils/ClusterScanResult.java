@@ -91,6 +91,7 @@ public class ClusterScanResult {
 
 			SharedSecret secret = new SharemindSharedSecret(nbits, res0_val,
 					res1_val, res2_val);
+			LOG.debug("Result has value " + secret.unshare());
 			CellScanner scanner = res0.cellScanner();
 			List<Cell> cells = new ArrayList<Cell>();
 

@@ -1,6 +1,7 @@
 package pt.uminho.haslab.testingutils;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.logging.Log;
@@ -31,7 +32,6 @@ public class ClusterTables {
 		for (Configuration config : configs) {
 			tables.add(new HTable(config, tbname));
 		}
-
 	}
 
 	public ClusterTables put(Put put) throws IOException {
@@ -72,6 +72,7 @@ public class ClusterTables {
 		@Override
 		public void run() {
 			try {
+				LOG.debug("Going to get row " + new BigInteger(get.getRow()));
 				result = table.get(get);
 			} catch (IOException ex) {
 				LOG.debug(ex);
@@ -136,9 +137,7 @@ public class ClusterTables {
 		}
 
 		for (ConcurrentGet t : tgets) {
-
 			t.join();
-
 		}
 
 		for (ConcurrentGet t : tgets) {
@@ -170,14 +169,13 @@ public class ClusterTables {
 		}
 
 		for (ConcurrentScan t : tscans) {
-			LOG.debug("Launching concurent Scans");
-
-			((Thread) t).start();
+			LOG.debug("Launching concurrent Scans");
+			t.start();
 		}
 
 		for (ConcurrentScan t : tscans) {
-			LOG.debug("Joining conccurent scans");
-			((Thread) t).join();
+			LOG.debug("Joining concurrent scans");
+			t.join();
 
 		}
 
@@ -199,12 +197,12 @@ public class ClusterTables {
 		}
 
 		for (ConcurrentScan t : tscans) {
-			((Thread) t).start();
+			t.start();
 		}
 
 		for (ConcurrentScan t : tscans) {
 
-			((Thread) t).join();
+			t.join();
 
 		}
 

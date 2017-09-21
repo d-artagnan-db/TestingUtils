@@ -42,7 +42,7 @@ public class ValidateShareClusterTest {
 
 		}
 
-		cluster = new ShareCluster(resources);
+		cluster = new ShareCluster(resources, 1);
 		this.maxBits = maxBits;
 		this.values = values;
 	}

@@ -22,7 +22,8 @@ public class ShareCluster {
 	protected final List<Configuration> configs;
 	static final Log LOG = LogFactory.getLog(ShareCluster.class.getName());
 
-	public ShareCluster(List<String> resources) throws Exception {
+	public ShareCluster(List<String> resources, int nRegionServers)
+			throws Exception {
 		clusters = new ArrayList<MiniHBaseCluster>();
 		admins = new ArrayList<HBaseAdmin>();
 		configs = new ArrayList<Configuration>();
@@ -48,7 +49,7 @@ public class ShareCluster {
 
 			configs.add(conf);
 			admins.add(new HBaseAdmin(conf));
-			MiniHBaseCluster hbase = new MiniHBaseCluster(conf, 1);
+			MiniHBaseCluster hbase = new MiniHBaseCluster(conf, nRegionServers);
 			clusters.add(hbase);
 
 		}
@@ -57,44 +58,6 @@ public class ShareCluster {
 				+ " clusters. Going to wait for them to start");
 		// wait for everything to be online, hbase and CMiddleware
 		Thread.sleep(1000);
-		LOG.info("Stopped waiting for cluster start");
-
-	}
-	public ShareCluster(List<String> resources, int lb) throws Exception {
-		clusters = new ArrayList<MiniHBaseCluster>();
-		admins = new ArrayList<HBaseAdmin>();
-		configs = new ArrayList<Configuration>();
-
-		LOG.debug("Going to start start shareCluster " + resources);
-
-		for (String resource : resources) {
-			LOG.debug("Going to start minicluster " + resource);
-			Configuration conf = HBaseConfiguration.create();
-			conf.addResource(resource);
-
-			MiniZooKeeperCluster zoo = new MiniZooKeeperCluster();
-			int zooKeeperPort = conf.getInt("zookeeper.port", -1);
-			String zooFile = conf.get("zookeeper.data.file");
-			String[] rootDir = conf.get("hbase.rootdir").split("file://");
-
-			FileUtils.deleteDirectory(new File(zooFile));
-			FileUtils.deleteDirectory(new File(rootDir[1]));
-			new File(rootDir[1]).mkdir();
-
-			zoo.setDefaultClientPort(zooKeeperPort);
-			zoo.startup(new File(zooFile));
-
-			configs.add(conf);
-			admins.add(new HBaseAdmin(conf));
-			MiniHBaseCluster hbase = new MiniHBaseCluster(conf, lb);
-			clusters.add(hbase);
-
-		}
-
-		LOG.info("Created " + clusters.size()
-				+ " clusters. Going to wait for them to start");
-		// wait for everything to be online, hbase and CMiddleware
-		Thread.sleep(30000);
 		LOG.info("Stopped waiting for cluster start");
 
 	}
