@@ -71,6 +71,9 @@ public class ClusterScanResult {
 			Result res0 = scans.get(0).get(j);
 			Result res1 = scans.get(1).get(j);
 			Result res2 = scans.get(2).get(j);
+			LOG.debug("1 - Scan result row is " + new String(res0.getRow()));
+			LOG.debug("2 - Scan result row is " + new String(res1.getRow()));
+			LOG.debug("3 - Scan result row is " + new String(res2.getRow()));
 
 			byte[] res0_id = res0.getRow();
 			byte[] res1_id = res1.getRow();
