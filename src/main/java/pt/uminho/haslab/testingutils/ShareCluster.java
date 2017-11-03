@@ -1,20 +1,17 @@
 package pt.uminho.haslab.testingutils;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.*;
+import org.apache.hadoop.hbase.client.HBaseAdmin;
+import org.apache.hadoop.hbase.zookeeper.MiniZooKeeperCluster;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.io.FileUtils;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.HColumnDescriptor;
-import org.apache.hadoop.hbase.HTableDescriptor;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
-import org.apache.hadoop.hbase.zookeeper.MiniZooKeeperCluster;
-import org.apache.hadoop.hbase.MiniHBaseCluster;
-import org.apache.hadoop.hbase.TableName;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class ShareCluster {
 	protected final List<MiniHBaseCluster> clusters;
@@ -49,14 +46,14 @@ public class ShareCluster {
 
 			configs.add(conf);
 			admins.add(new HBaseAdmin(conf));
-			MiniHBaseCluster hbase = new MiniHBaseCluster(conf, nRegionServers);
-			clusters.add(hbase);
+			MiniHBaseCluster hBase = new MiniHBaseCluster(conf, nRegionServers);
+			clusters.add(hBase);
 
 		}
 
 		LOG.info("Created " + clusters.size()
 				+ " clusters. Going to wait for them to start");
-		// wait for everything to be online, hbase and CMiddleware
+		// wait for everything to be online, hBase and CMiddleware
 		Thread.sleep(1000);
 		LOG.info("Stopped waiting for cluster start");
 

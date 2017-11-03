@@ -1,19 +1,15 @@
 package pt.uminho.haslab.testingutils;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.TableName;
-import org.apache.hadoop.hbase.client.Get;
-import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.client.Result;
-import org.apache.hadoop.hbase.client.ResultScanner;
-import org.apache.hadoop.hbase.client.Scan;
+import org.apache.hadoop.hbase.client.*;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ClusterTables {
 
@@ -191,8 +187,8 @@ public class ClusterTables {
 			InterruptedException {
 		List<ConcurrentScan> tscans = new ArrayList<ConcurrentScan>();
 		List<List<Result>> results = new ArrayList<List<Result>>();
-		for (int i = 0; i < 3; i++) {
-			HTable table = tables.get(i);
+
+		for (HTable table : tables) {
 			tscans.add(new ConcurrentScan(table, scan));
 		}
 
@@ -201,9 +197,7 @@ public class ClusterTables {
 		}
 
 		for (ConcurrentScan t : tscans) {
-
 			t.join();
-
 		}
 
 		for (ConcurrentScan t : tscans) {

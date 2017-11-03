@@ -81,6 +81,14 @@ public class ValuesGenerator {
 		return sb.toString();
 	}
 
+	public static BigInteger randomBigInteger(int nBits) {
+		return new BigInteger(nBits, generator);
+	}
+
+	public static int randomInt() {
+		return generator.nextInt();
+	}
+
 	public static Collection TestPeerGenerator() {
 
 		Object[] parameters = new Object[2];
