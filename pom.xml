@@ -1,64 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-<modelVersion>4.0.0</modelVersion>
-<groupId>pt.uminho.haslab</groupId>
-<artifactId>testingutilities</artifactId>
-<name>testingutilities</name>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>pt.uminho.haslab</groupId>
+    <artifactId>testingutilities</artifactId>
+    <name>testingutilities</name>
     <version>1.0.0</version>
-<packaging>jar</packaging>
-<properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <relativePath>..</relativePath>
-</properties>
-<dependencies>
-    <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>4.11</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.apache.hbase</groupId>
-        <artifactId>hbase-testing-util</artifactId>
-        <version>0.98.24-hadoop2</version>
-      <type>jar</type>
-    </dependency>
-    <dependency>
-        <groupId>pt.uminho.haslab</groupId>
-        <artifactId>smpc</artifactId>
-        <version>1.1.0</version>
-      <type>jar</type>
-    </dependency>
-    <dependency>
-        <groupId>org.jetbrains</groupId>
-        <artifactId>annotations-java5</artifactId>
-        <version>RELEASE</version>
-    </dependency>
-</dependencies>
-<build>
-   <plugins>
-        <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <version>2.3.2</version>
-            <configuration>
-                <source>1.5</source>
-                <target>1.5</target>
-            </configuration>
-        </plugin>
-        <plugin>
-            <groupId>com.googlecode.maven-java-formatter-plugin</groupId>
-            <artifactId>maven-java-formatter-plugin</artifactId>
-            <version>0.4</version>
-            <executions>
-                <execution>
-                    <goals>
-                        <goal>format</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
-    </plugins>
-</build>
+    <packaging>jar</packaging>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <relativePath>..</relativePath>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-testing-util</artifactId>
+            <version>0.98.24-hadoop2</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>pt.uminho.haslab</groupId>
+            <artifactId>smpc</artifactId>
+            <version>1.1.0</version>
+            <type>jar</type>
+        </dependency>
+    </dependencies>
 </project>
 

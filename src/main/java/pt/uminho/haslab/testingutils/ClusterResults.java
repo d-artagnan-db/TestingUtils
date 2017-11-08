@@ -1,49 +1,50 @@
 package pt.uminho.haslab.testingutils;
 
-import java.util.List;
 import org.apache.hadoop.hbase.client.Result;
+
+import java.util.List;
 
 public class ClusterResults {
 
-	protected final List<Result> results;
+    protected final List<Result> results;
 
-	public ClusterResults(List<Result> resp) {
+    public ClusterResults(List<Result> resp) {
 
-		this.results = resp;
-	}
+        this.results = resp;
+    }
 
-	public List<Result> getResults() {
-		return results;
-	}
+    public List<Result> getResults() {
+        return results;
+    }
 
-	public Result getResult(int i) {
-		return results.get(i);
-	}
+    public Result getResult(int i) {
+        return results.get(i);
+    }
 
-	public boolean allEmpty() {
+    public boolean allEmpty() {
 
-		boolean empty = true;
+        boolean empty = true;
 
-		for (Result res : results) {
-			empty &= res.isEmpty();
-		}
+        for (Result res : results) {
+            empty &= res.isEmpty();
+        }
 
-		return empty;
-	}
+        return empty;
+    }
 
-	public boolean oneEmpty() {
-		boolean empty = false;
+    public boolean oneEmpty() {
+        boolean empty = false;
 
-		for (Result res : results) {
+        for (Result res : results) {
 
-			empty |= res.isEmpty();
-		}
-		return empty;
-	}
+            empty |= res.isEmpty();
+        }
+        return empty;
+    }
 
-	public boolean isInconsistant() {
-		return oneEmpty() ^ allEmpty();
+    public boolean isInconsistant() {
+        return oneEmpty() ^ allEmpty();
 
-	}
+    }
 
 }

@@ -1,131 +1,123 @@
 package pt.uminho.haslab.testingutils;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hbase.client.Result;
 
+import java.math.BigInteger;
+import java.util.*;
+
 public class ScanValidator {
 
-	static final Log LOG = LogFactory.getLog(ScanValidator.class.getName());
+    static final Log LOG = LogFactory.getLog(ScanValidator.class.getName());
 
-	private final List<BigInteger> vals;
+    private final List<BigInteger> vals;
+    private final Random rand;
+    private BigInteger selectedStartKey;
+    private int selectedStartIndex;
 
-	private BigInteger selectedStartKey;
+    private BigInteger selectedStopKey;
 
-	private final Random rand;
+    public ScanValidator(List<BigInteger> values) {
+        this.vals = values;
+        selectedStartKey = null;
+        selectedStopKey = null;
+        rand = new Random();
+        sortValues();
+    }
 
-	private int selectedStartIndex;
+    public byte[] generateStartKey() {
+        selectedStartIndex = rand.nextInt(vals.size());
+        selectedStartKey = vals.get(selectedStartIndex);
+        return selectedStartKey.toByteArray();
+    }
 
-	private BigInteger selectedStopKey;
+    public byte[] generateStopKey() {
+        int stopIndex = 0;
 
-	public ScanValidator(List<BigInteger> values) {
-		this.vals = values;
-		selectedStartKey = null;
-		selectedStopKey = null;
-		rand = new Random();
-		sortValues();
-	}
+        if (selectedStartIndex == 0) {
+            stopIndex = rand.nextInt(vals.size());
+        } else {
+            while (stopIndex < selectedStartIndex) {
+                stopIndex = rand.nextInt(vals.size());
+            }
+        }
 
-	public byte[] generateStartKey() {
-		selectedStartIndex = rand.nextInt(vals.size());
-		selectedStartKey = vals.get(selectedStartIndex);
-		return selectedStartKey.toByteArray();
-	}
+        selectedStopKey = vals.get(stopIndex);
+        return selectedStopKey.toByteArray();
+    }
 
-	public byte[] generateStopKey() {
-		int stopIndex = 0;
+    private void sortValues() {
+        Collections.sort(vals, new Comparator<BigInteger>() {
+            public int compare(BigInteger value1, BigInteger value2) {
+                return value1.compareTo(value2);
+            }
+        });
 
-		if (selectedStartIndex == 0) {
-			stopIndex = rand.nextInt(vals.size());
-		} else {
-			while (stopIndex < selectedStartIndex) {
-				stopIndex = rand.nextInt(vals.size());
-			}
-		}
+    }
 
-		selectedStopKey = vals.get(stopIndex);
-		return selectedStopKey.toByteArray();
-	}
+    public boolean validateResults(List<Result> results) {
+        boolean valid;
+        LOG.debug("Going to validate Results");
+        List<BigInteger> valuesInRange = getKeysInRange();
 
-	private void sortValues() {
-		Collections.sort(vals, new Comparator<BigInteger>() {
-			public int compare(BigInteger value1, BigInteger value2) {
-				return value1.compareTo(value2);
-			}
-		});
+        Set<BigInteger> valueSet = new HashSet<BigInteger>(valuesInRange);
+        LOG.debug("Values in range " + valuesInRange + " a total of "
+                + valuesInRange.size());
+        LOG.debug("Received " + results.size() + " from the database ");
+        valid = valuesInRange.size() == results.size();
 
-	}
+        for (Result res : results) {
+            byte[] resValue = res.getRow();
+            BigInteger val = new BigInteger(resValue);
+            LOG.debug("Receive value is " + val);
+            valid &= valueSet.contains(val);
+        }
+        return valid;
+    }
 
-	public boolean validateResults(List<Result> results) {
-		boolean valid;
-		LOG.debug("Going to validate Results");
-		List<BigInteger> valuesInRange = getKeysInRange();
+    private List<BigInteger> getKeysInRange() {
+        List<BigInteger> rangeValues = new ArrayList<BigInteger>();
+        LOG.debug("Going to get keys in range");
+        LOG.debug("Selected start key is " + this.selectedStartKey);
+        LOG.debug("Selected stop key is " + this.selectedStopKey);
 
-		Set<BigInteger> valueSet = new HashSet<BigInteger>(valuesInRange);
-		LOG.debug("Values in range " + valuesInRange + " a total of "
-				+ valuesInRange.size());
-		LOG.debug("Received " + results.size() + " from the database ");
-		valid = valuesInRange.size() == results.size();
+        for (int i = 0; i < vals.size(); i++) {
+            BigInteger val = vals.get(i);
+            LOG.debug("Value stored is " + val);
 
-		for (Result res : results) {
-			byte[] resValue = res.getRow();
-			BigInteger val = new BigInteger(resValue);
-			LOG.debug("Receive value is " + val);
-			valid &= valueSet.contains(val);
-		}
-		return valid;
-	}
+            /**
+             * default case is when no key is generated and every value is valid
+             */
+            boolean valid = true;
 
-	private List<BigInteger> getKeysInRange() {
-		List<BigInteger> rangeValues = new ArrayList<BigInteger>();
-		LOG.debug("Going to get keys in range");
-		LOG.debug("Selected start key is " + this.selectedStartKey);
-		LOG.debug("Selected stop key is " + this.selectedStopKey);
+            if (this.selectedStartKey != null && this.selectedStopKey != null) {
+                boolean greaterOrEqualThan = val
+                        .compareTo(this.selectedStartKey) == 0
+                        || val.compareTo(this.selectedStartKey) == 1;
+                boolean lessOrEqualThan = val.compareTo(this.selectedStopKey) == -1;
 
-		for (int i = 0; i < vals.size(); i++) {
-			BigInteger val = vals.get(i);
-			LOG.debug("Value stored is " + val);
+                valid = greaterOrEqualThan && lessOrEqualThan;
+            } else if (this.selectedStartKey == null
+                    && this.selectedStopKey != null) {
+                boolean lessOrEqualThan = val.compareTo(this.selectedStopKey) == -1;
+                valid = lessOrEqualThan;
+            } else if (this.selectedStartKey != null
+                    && this.selectedStopKey == null) {
+                boolean greaterOrEqualThan = val
+                        .compareTo(this.selectedStartKey) == 0
+                        || val.compareTo(this.selectedStartKey) == 1;
+                valid = greaterOrEqualThan;
+            }
 
-			/**
-			 * default case is when no key is generated and every value is valid
-			 */
-			boolean valid = true;
+            if (valid) {
+                LOG.debug("Going to add value " + val);
+                rangeValues.add(val);
+            }
 
-			if (this.selectedStartKey != null && this.selectedStopKey != null) {
-				boolean greaterOrEqualThan = val
-						.compareTo(this.selectedStartKey) == 0
-						|| val.compareTo(this.selectedStartKey) == 1;
-				boolean lessOrEqualThan = val.compareTo(this.selectedStopKey) == -1;
+        }
 
-				valid = greaterOrEqualThan && lessOrEqualThan;
-			} else if (this.selectedStartKey == null
-					&& this.selectedStopKey != null) {
-				boolean lessOrEqualThan = val.compareTo(this.selectedStopKey) == -1;
-				valid = lessOrEqualThan;
-			} else if (this.selectedStartKey != null
-					&& this.selectedStopKey == null) {
-				boolean greaterOrEqualThan = val
-						.compareTo(this.selectedStartKey) == 0
-						|| val.compareTo(this.selectedStartKey) == 1;
-				valid = greaterOrEqualThan;
-			}
+        return rangeValues;
 
-			if (valid) {
-				LOG.debug("Going to add value " + val);
-				rangeValues.add(val);
-			}
-
-		}
-
-		return rangeValues;
-
-	}
+    }
 }

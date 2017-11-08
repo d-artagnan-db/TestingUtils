@@ -13,198 +13,198 @@ import java.util.List;
 
 public class ClusterTables {
 
-	static final Log LOG = LogFactory.getLog(ClusterTables.class.getName());
+    static final Log LOG = LogFactory.getLog(ClusterTables.class.getName());
 
-	protected final List<Configuration> configs;
-	protected final TableName tname;
-	protected final List<HTable> tables;
+    protected final List<Configuration> configs;
+    protected final TableName tname;
+    protected final List<HTable> tables;
 
-	public ClusterTables(List<Configuration> configs, TableName tbname)
-			throws IOException {
-		this.configs = configs;
-		this.tname = tbname;
-		tables = new ArrayList<HTable>();
+    public ClusterTables(List<Configuration> configs, TableName tbname)
+            throws IOException {
+        this.configs = configs;
+        this.tname = tbname;
+        tables = new ArrayList<HTable>();
 
-		for (Configuration config : configs) {
-			tables.add(new HTable(config, tbname));
-		}
-	}
+        for (Configuration config : configs) {
+            tables.add(new HTable(config, tbname));
+        }
+    }
 
-	public ClusterTables put(Put put) throws IOException {
+    public ClusterTables put(Put put) throws IOException {
 
-		for (HTable table : tables) {
-			table.put(put);
-		}
-		return this;
-	}
+        for (HTable table : tables) {
+            table.put(put);
+        }
+        return this;
+    }
 
-	public ClusterResults get(Get get) throws IOException {
-		List<Result> results = new ArrayList<Result>();
+    public ClusterResults get(Get get) throws IOException {
+        List<Result> results = new ArrayList<Result>();
 
-		for (HTable table : tables) {
-			results.add(table.get(get));
+        for (HTable table : tables) {
+            results.add(table.get(get));
 
-		}
+        }
 
-		return new ClusterResults(results);
+        return new ClusterResults(results);
 
-	}
+    }
 
-	private class ConcurrentGet extends Thread {
+    public ClusterResults get(List<Get> gets) throws IOException,
+            InterruptedException {
+        List<Result> results = new ArrayList<Result>();
+        List<ConcurrentGet> tgets = new ArrayList<ConcurrentGet>();
 
-		private final Get get;
-		private final HTable table;
-		private Result result;
+        for (int i = 0; i < gets.size(); i++) {
+            HTable table = tables.get(i);
+            Get get = gets.get(i);
+            tgets.add(new ConcurrentGet(table, get));
+        }
 
-		public ConcurrentGet(HTable table, Get get) {
-			this.get = get;
-			this.table = table;
-		}
+        for (ConcurrentGet t : tgets) {
+            t.start();
+        }
 
-		public Result getResult() {
-			return result;
-		}
+        for (ConcurrentGet t : tgets) {
+            t.join();
+        }
 
-		@Override
-		public void run() {
-			try {
-				LOG.debug("Going to get row " + new BigInteger(get.getRow()));
-				result = table.get(get);
-			} catch (IOException ex) {
-				LOG.debug(ex);
-				throw new IllegalStateException(ex);
-			}
+        for (ConcurrentGet t : tgets) {
 
-		}
+            results.add(t.getResult());
+        }
 
-	}
+        return new ClusterResults(results);
 
-	private class ConcurrentScan extends Thread {
+    }
 
-		private final Scan scan;
-		private final HTable table;
-		private ResultScanner scanner;
-		private final List<Result> results;
+    public ClusterTables put(int clusterID, Put put) throws IOException {
+        tables.get(clusterID).put(put);
+        return this;
 
-		public ConcurrentScan(HTable table, Scan scan) {
-			this.scan = scan;
-			this.table = table;
-			results = new ArrayList<Result>();
-		}
+    }
 
-		public List<Result> getResults() {
-			return results;
-		}
+    public ClusterScanResult scan(List<Scan> scans) throws IOException,
+            InterruptedException {
 
-		@Override
-		public void run() {
-			try {
-				scanner = table.getScanner(scan);
-				LOG.debug("Concurrent scanner is running");
-				for (Result result = scanner.next(); result != null; result = scanner
-						.next()) {
-					LOG.debug("Going to add scan result " + result);
-					results.add(result);
-				}
+        List<ConcurrentScan> tscans = new ArrayList<ConcurrentScan>();
+        List<List<Result>> results = new ArrayList<List<Result>>();
 
-			} catch (IOException ex) {
-				LOG.debug(ex);
-				throw new IllegalStateException(ex);
-			}
-			LOG.debug("Scan result size is " + results.size());
+        for (int i = 0; i < scans.size(); i++) {
+            HTable table = tables.get(i);
+            Scan scan = scans.get(i);
+            LOG.debug("Creating new Concurrent Scan");
+            tscans.add(new ConcurrentScan(table, scan));
+        }
 
-		}
+        for (ConcurrentScan t : tscans) {
+            LOG.debug("Launching concurrent Scans");
+            t.start();
+        }
 
-	}
+        for (ConcurrentScan t : tscans) {
+            LOG.debug("Joining concurrent scans");
+            t.join();
 
-	public ClusterResults get(List<Get> gets) throws IOException,
-			InterruptedException {
-		List<Result> results = new ArrayList<Result>();
-		List<ConcurrentGet> tgets = new ArrayList<ConcurrentGet>();
+        }
 
-		for (int i = 0; i < gets.size(); i++) {
-			HTable table = tables.get(i);
-			Get get = gets.get(i);
-			tgets.add(new ConcurrentGet(table, get));
-		}
+        for (ConcurrentScan t : tscans) {
 
-		for (ConcurrentGet t : tgets) {
-			t.start();
-		}
+            results.add(t.getResults());
+        }
 
-		for (ConcurrentGet t : tgets) {
-			t.join();
-		}
+        return new ClusterScanResult(results);
+    }
 
-		for (ConcurrentGet t : tgets) {
+    public ClusterScanResult scan(Scan scan) throws IOException,
+            InterruptedException {
+        List<ConcurrentScan> tscans = new ArrayList<ConcurrentScan>();
+        List<List<Result>> results = new ArrayList<List<Result>>();
 
-			results.add(t.getResult());
-		}
+        for (HTable table : tables) {
+            tscans.add(new ConcurrentScan(table, scan));
+        }
 
-		return new ClusterResults(results);
+        for (ConcurrentScan t : tscans) {
+            t.start();
+        }
 
-	}
+        for (ConcurrentScan t : tscans) {
+            t.join();
+        }
 
-	public ClusterTables put(int clusterID, Put put) throws IOException {
-		tables.get(clusterID).put(put);
-		return this;
+        for (ConcurrentScan t : tscans) {
 
-	}
+            results.add(t.getResults());
+        }
 
-	public ClusterScanResult scan(List<Scan> scans) throws IOException,
-			InterruptedException {
+        return new ClusterScanResult(results);
+    }
 
-		List<ConcurrentScan> tscans = new ArrayList<ConcurrentScan>();
-		List<List<Result>> results = new ArrayList<List<Result>>();
+    private class ConcurrentGet extends Thread {
 
-		for (int i = 0; i < scans.size(); i++) {
-			HTable table = tables.get(i);
-			Scan scan = scans.get(i);
-			LOG.debug("Creating new Concurrent Scan");
-			tscans.add(new ConcurrentScan(table, scan));
-		}
+        private final Get get;
+        private final HTable table;
+        private Result result;
 
-		for (ConcurrentScan t : tscans) {
-			LOG.debug("Launching concurrent Scans");
-			t.start();
-		}
+        public ConcurrentGet(HTable table, Get get) {
+            this.get = get;
+            this.table = table;
+        }
 
-		for (ConcurrentScan t : tscans) {
-			LOG.debug("Joining concurrent scans");
-			t.join();
+        public Result getResult() {
+            return result;
+        }
 
-		}
+        @Override
+        public void run() {
+            try {
+                LOG.debug("Going to get row " + new BigInteger(get.getRow()));
+                result = table.get(get);
+            } catch (IOException ex) {
+                LOG.debug(ex);
+                throw new IllegalStateException(ex);
+            }
 
-		for (ConcurrentScan t : tscans) {
+        }
 
-			results.add(t.getResults());
-		}
+    }
 
-		return new ClusterScanResult(results);
-	}
+    private class ConcurrentScan extends Thread {
 
-	public ClusterScanResult scan(Scan scan) throws IOException,
-			InterruptedException {
-		List<ConcurrentScan> tscans = new ArrayList<ConcurrentScan>();
-		List<List<Result>> results = new ArrayList<List<Result>>();
+        private final Scan scan;
+        private final HTable table;
+        private final List<Result> results;
+        private ResultScanner scanner;
 
-		for (HTable table : tables) {
-			tscans.add(new ConcurrentScan(table, scan));
-		}
+        public ConcurrentScan(HTable table, Scan scan) {
+            this.scan = scan;
+            this.table = table;
+            results = new ArrayList<Result>();
+        }
 
-		for (ConcurrentScan t : tscans) {
-			t.start();
-		}
+        public List<Result> getResults() {
+            return results;
+        }
 
-		for (ConcurrentScan t : tscans) {
-			t.join();
-		}
+        @Override
+        public void run() {
+            try {
+                scanner = table.getScanner(scan);
+                LOG.debug("Concurrent scanner is running");
+                for (Result result = scanner.next(); result != null; result = scanner
+                        .next()) {
+                    LOG.debug("Going to add scan result " + result);
+                    results.add(result);
+                }
 
-		for (ConcurrentScan t : tscans) {
+            } catch (IOException ex) {
+                LOG.debug(ex);
+                throw new IllegalStateException(ex);
+            }
+            LOG.debug("Scan result size is " + results.size());
 
-			results.add(t.getResults());
-		}
+        }
 
-		return new ClusterScanResult(results);
-	}
+    }
 }
