@@ -70,6 +70,10 @@ public class ValuesGenerator {
 		return sb.toString();
 	}
 
+	public static int randomInt() {
+		return Math.abs(generator.nextInt());
+	}
+
 	public static String randomNumber(int nbits) {
 		char[] chars = "0123456789".toCharArray();
 		StringBuilder sb = new StringBuilder();
@@ -83,10 +87,6 @@ public class ValuesGenerator {
 
 	public static BigInteger randomBigInteger(int nBits) {
 		return new BigInteger(nBits, generator);
-	}
-
-	public static int randomInt() {
-		return generator.nextInt();
 	}
 
 	public static Collection TestPeerGenerator() {
