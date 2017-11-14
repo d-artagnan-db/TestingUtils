@@ -24,7 +24,17 @@ public class ShareCluster {
         clusters = new ArrayList<MiniHBaseCluster>();
         admins = new ArrayList<HBaseAdmin>();
         configs = new ArrayList<Configuration>();
+        initalizeShareCluster(resources, nRegionServers, null);
+    }
 
+    public ShareCluster(List<String> resources, int nRegionServers, String tableSchemaPath) throws IOException, InterruptedException {
+        clusters = new ArrayList<MiniHBaseCluster>();
+        admins = new ArrayList<HBaseAdmin>();
+        configs = new ArrayList<Configuration>();
+        initalizeShareCluster(resources, nRegionServers, tableSchemaPath);
+    }
+
+    private void initalizeShareCluster(List<String> resources, int nRegionServers, String tableSchemaPath) throws IOException, InterruptedException {
         LOG.debug("Going to start start shareCluster " + resources);
 
         for (String resource : resources) {
@@ -32,6 +42,10 @@ public class ShareCluster {
             Configuration conf = HBaseConfiguration.create();
             conf.addResource(resource);
 
+            if(tableSchemaPath != null){
+                LOG.debug("Set smhbase.schema to " + tableSchemaPath);
+                conf.set("smhbase.schema", tableSchemaPath);
+            }
             MiniZooKeeperCluster zoo = new MiniZooKeeperCluster();
             int zooKeeperPort = conf.getInt("zookeeper.port", -1);
             String zooFile = conf.get("zookeeper.data.file");
@@ -53,7 +67,7 @@ public class ShareCluster {
 
         LOG.info("Created " + clusters.size()
                 + " clusters. Going to wait for them to start");
-        // wait for everything to be online, hBase and CMiddleware
+        // wait for everything to be online, HBase and CMiddleware
         Thread.sleep(1000);
         LOG.info("Stopped waiting for cluster start");
 
