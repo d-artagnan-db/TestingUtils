@@ -46,7 +46,7 @@ public class ValuesGenerator {
         return Arrays.asList(parameters);
     }
 
-    public static List<BigInteger> microbenchMarkValueGenerator(int nVals) {
+    public static List<BigInteger> microbenchmarkValueGenerator(int nVals) {
         List<BigInteger> values = new ArrayList<BigInteger>();
 
         for (int i = 0; i < nVals; i++) {
