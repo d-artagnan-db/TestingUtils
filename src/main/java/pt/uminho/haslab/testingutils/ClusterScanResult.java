@@ -6,8 +6,8 @@ import org.apache.hadoop.hbase.Cell;
 import org.apache.hadoop.hbase.CellScanner;
 import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.client.Result;
-import pt.uminho.haslab.smhbase.interfaces.SharedSecret;
-import pt.uminho.haslab.smhbase.sharemindImp.SharemindSharedSecret;
+import pt.uminho.haslab.smpc.interfaces.SharedSecret;
+import pt.uminho.haslab.smpc.sharemindImp.SharemindSharedSecret;
 
 import java.io.IOException;
 import java.math.BigInteger;

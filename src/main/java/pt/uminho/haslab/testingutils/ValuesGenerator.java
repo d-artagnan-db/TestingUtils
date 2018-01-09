@@ -46,6 +46,20 @@ public class ValuesGenerator {
         return Arrays.asList(parameters);
     }
 
+    public static Collection SingleIntValueGenerator(int nValues){
+        Object[] parameters = new Object[nValues];
+
+        for (int i = 0; i < nValues; i++) {
+            int value = generator.nextInt();
+
+            Object[] parameter = new Object[1];
+            parameter[0] = value;
+            parameters[i] = parameter;
+        }
+
+        return Arrays.asList(parameters);
+    }
+
     public static List<BigInteger> microbenchmarkValueGenerator(int nVals) {
         List<BigInteger> values = new ArrayList<BigInteger>();
 
