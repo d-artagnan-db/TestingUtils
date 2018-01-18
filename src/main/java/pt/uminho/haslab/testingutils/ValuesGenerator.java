@@ -87,6 +87,9 @@ public class ValuesGenerator {
     public static int randomInt() {
         return Math.abs(generator.nextInt());
     }
+    public static long randomLong() {
+        return Math.abs(generator.nextLong());
+    }
 
     public static String randomNumber(int nbits) {
         char[] chars = "0123456789".toCharArray();
